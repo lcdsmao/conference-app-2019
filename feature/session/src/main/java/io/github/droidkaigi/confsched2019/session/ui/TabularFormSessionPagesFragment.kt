@@ -53,13 +53,18 @@ class TabularFormSessionPagesFragment : DaggerFragment() {
         binding.tabularFormSessionsTabLayout.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
-                    val day = TabularFormSessionPagesFragmentArgs.Builder()
-                        .setDay(days[tab.position].day)
-                        .build()
-                    val selectedFragment = TabularFormSessionPageFragment.newInstance(day)
-                    childFragmentManager.beginTransaction()
-                        .replace(R.id.tabular_form_sessions_fragment_container, selectedFragment)
-                        .commit()
+                    val day = days[tab.position].day
+                    val tag = createTabularFormSessionPageFragmentTag(day)
+                    val fragment = childFragmentManager.findFragmentByTag(tag)
+                    if (fragment == null) {
+                        val args = TabularFormSessionPagesFragmentArgs.Builder()
+                            .setDay(day)
+                            .build()
+                        val selectedFragment = TabularFormSessionPageFragment.newInstance(args)
+                        childFragmentManager.beginTransaction()
+                            .replace(R.id.tabular_form_sessions_fragment_container, selectedFragment, tag)
+                            .commit()
+                    }
                 }
 
                 override fun onTabReselected(tab: TabLayout.Tab?) {}
@@ -87,6 +92,8 @@ class TabularFormSessionPagesFragment : DaggerFragment() {
             }
         }
     }
+
+    private fun createTabularFormSessionPageFragmentTag(day: Int) = "TabularFormSessionPageFragment$day"
 }
 
 @Module
